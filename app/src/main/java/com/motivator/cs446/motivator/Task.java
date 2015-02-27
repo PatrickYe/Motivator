@@ -1,18 +1,24 @@
 package com.motivator.cs446.motivator;
 
+import java.util.Date;
+
 /**
  * Created by jacobsimon on 2/8/15.
  */
 public class Task {
     public String title;
-    public String deadline;
+    public Date deadline;
     enum State {IN_PROGRESS, COMPLETED, FAILED, DELETED};
     public State state;
 
 
-    public Task(String title, String deadline) {
+    public Task(String title, Date deadline) {
+        this(title, deadline, State.IN_PROGRESS);
+    }
+
+    public Task(String title, Date deadline, State state) {
         this.title = title;
         this.deadline = deadline;
-        this.state = State.IN_PROGRESS;
+        this.state = state;
     }
 }

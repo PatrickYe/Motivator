@@ -1,8 +1,11 @@
 package com.motivator.cs446.motivator;
 
 import android.content.Context;
+import android.content.Intent;
+import android.gesture.Prediction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,7 +17,17 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.internal.util.Predicate;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,6 +35,7 @@ import java.util.List;
 public class MainActivity extends ActionBarActivity {
 
     final ArrayList<Task> list = new ArrayList<Task>();
+    public final static String fileName = "taskData";
     StableArrayAdapter adapter;
 
     @Override
@@ -30,31 +44,39 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         final ListView listview = (ListView) findViewById(R.id.listview);
 
+        TaskDataSource.getInstance().load(getApplicationContext());
+
+        Predicate<Task> isInProgress = new Predicate<Task>() {
+            @Override
+            public boolean apply(Task task) {
+                return task.state == Task.State.IN_PROGRESS;
+            }
+        };
         adapter = new StableArrayAdapter(this,
-                R.layout.task_cell, list);
+                R.layout.task_cell, TaskDataSource.getInstance().getInProgressTasks());
 
 
 
         listview.setAdapter(adapter);
 
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view,
-                                    int position, long id) {
-                final Task item = (Task) parent.getItemAtPosition(position);
-                view.animate().setDuration(1000).alpha(0)
-                        .withEndAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                list.remove(item);
-                                adapter.notifyDataSetChanged();
-                                view.setAlpha(1);
-                            }
-                        });
-            }
-
-        });
+//        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, final View view,
+//                                    int position, long id) {
+//                final Task item = (Task) parent.getItemAtPosition(position);
+//                view.animate().setDuration(1000).alpha(0)
+//                        .withEndAction(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Task
+//                                adapter.notifyDataSetChanged();
+//                                view.setAlpha(1);
+//                            }
+//                        });
+//            }
+//
+//        });
     }
 
     @Override
@@ -78,12 +100,44 @@ public class MainActivity extends ActionBarActivity {
 
         if (id == R.id.add_task) {
 
-            list.add(new Task("Homework", "9:00"));
+            Intent intent = new Intent(this, AddTaskActivity.class);
+            startActivity(intent);
 
-            adapter.notifyDataSetChanged();
+//            list.add(new Task("Homework", "9:00"));
+
+//            adapter.notifyDataSetChanged();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("Jacob", "RESUMING %%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        readTasks();
+        adapter.notifyDataSetChanged();
+    }
+
+    private void readTasks() {
+        try {
+            InputStream inputStream = getApplicationContext().openFileInput(fileName);
+            Log.d("JACOB", "reading tasks **************");
+            if(inputStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line = reader.readLine();
+                while(line != null) {
+                    Log.d("JACOB", line + "&&&&&&&&&&&&&&&&&&&&&&&&&&");
+                    String[] taskData = line.split(";");
+                    Date dueDate = new Date(taskData[1] + " " + taskData[2]);
+                    list.add(new Task(taskData[0], dueDate));
+                    line = reader.readLine();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private class StableArrayAdapter extends ArrayAdapter<Task> {
@@ -113,19 +167,17 @@ public class MainActivity extends ActionBarActivity {
             ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.deleteButton);
             // Populate the data into the template view using the data object
             taskName.setText(task.title);
-            deadline.setText(task.deadline);
+            deadline.setText(task.deadline.toString());
             // Set click listeners for the buttons
             final View viewHolder = convertView;
             doneButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    task.state = Task.State.COMPLETED;
+                    TaskDataSource.getInstance().updateState(task, Task.State.COMPLETED, getApplicationContext());
                     viewHolder.animate().setDuration(1000).alpha(0)
                             .withEndAction(new Runnable() {
                                 @Override
                                 public void run() {
-
-                                    list.remove(task);
                                     adapter.notifyDataSetChanged();
                                     viewHolder.setAlpha(1);
                                 }
@@ -135,12 +187,11 @@ public class MainActivity extends ActionBarActivity {
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    task.state = Task.State.DELETED;
+                    TaskDataSource.getInstance().updateState(task, Task.State.DELETED, getApplicationContext());
                     viewHolder.animate().setDuration(1000).alpha(0)
                             .withEndAction(new Runnable() {
                                 @Override
                                 public void run() {
-                                    list.remove(task);
                                     adapter.notifyDataSetChanged();
                                     viewHolder.setAlpha(1);
                                 }
