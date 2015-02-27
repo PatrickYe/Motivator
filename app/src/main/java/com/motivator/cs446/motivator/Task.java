@@ -6,7 +6,7 @@ package com.motivator.cs446.motivator;
 public class Task {
     public String title;
     public String deadline;
-    enum State {IN_PROGRESS, COMPLETED, FAILED};
+    enum State {IN_PROGRESS, COMPLETED, FAILED, DELETED};
     public State state;
 
 
