@@ -39,11 +39,19 @@
         android:text="Example application"
         android:textSize="16sp" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/doneButton"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:src="@drawable/done_button"
+        android:layout_alignLeft="@+id/deleteButton"
+        android:layout_marginRight="10px"/>
+
+    <ImageButton
+        android:id="@+id/deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:src="@drawable/close_button"
         android:layout_alignParentRight="true"/>
 
 </RelativeLayout>
