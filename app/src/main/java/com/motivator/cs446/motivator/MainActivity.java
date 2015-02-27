@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -41,7 +42,6 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view,
                                     int position, long id) {
-                System.out.println(id + "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
                 final Task item = (Task) parent.getItemAtPosition(position);
                 view.animate().setDuration(1000).alpha(0)
                         .withEndAction(new Runnable() {
@@ -101,7 +101,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             // Get the data item for this position
-            Task task = getItem(position);
+            final Task task = getItem(position);
             // Check if an existing view is being reused, otherwise inflate the view
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.task_cell, parent, false);
@@ -109,9 +109,44 @@ public class MainActivity extends ActionBarActivity {
             // Lookup view for data population
             TextView taskName = (TextView) convertView.findViewById(R.id.firstLine);
             TextView deadline = (TextView) convertView.findViewById(R.id.secondLine);
+            ImageButton doneButton = (ImageButton) convertView.findViewById(R.id.doneButton);
+            ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.deleteButton);
             // Populate the data into the template view using the data object
             taskName.setText(task.title);
             deadline.setText(task.deadline);
+            // Set click listeners for the buttons
+            final View viewHolder = convertView;
+            doneButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    task.state = Task.State.COMPLETED;
+                    viewHolder.animate().setDuration(1000).alpha(0)
+                            .withEndAction(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    list.remove(task);
+                                    adapter.notifyDataSetChanged();
+                                    viewHolder.setAlpha(1);
+                                }
+                            });
+                }
+            });
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    task.state = Task.State.DELETED;
+                    viewHolder.animate().setDuration(1000).alpha(0)
+                            .withEndAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    list.remove(task);
+                                    adapter.notifyDataSetChanged();
+                                    viewHolder.setAlpha(1);
+                                }
+                            });
+                }
+            });
             // Return the completed view to render on screen
             return convertView;
         }

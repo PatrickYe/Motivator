@@ -44,14 +44,14 @@
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:src="@drawable/done_button"
-        android:layout_alignLeft="@+id/deleteButton"
-        android:layout_marginRight="10px"/>
+        android:layout_alignEnd="@+id/deleteButton"
+        android:layout_marginRight="70dp"/>
 
     <ImageButton
         android:id="@+id/deleteButton"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:src="@drawable/close_button"
-        android:layout_alignParentRight="true"/>
+        android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>
