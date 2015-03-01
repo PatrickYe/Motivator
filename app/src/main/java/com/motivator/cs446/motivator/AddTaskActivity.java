@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import java.io.FileOutputStream;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,12 +21,22 @@ import java.util.Date;
  * Created by jacobsimon on 2/27/15.
  */
 public class AddTaskActivity extends ActionBarActivity {
+    private TaskDataSource dataSource;
+    private Date deadline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
         setTitle("New Task");
+        dataSource = new TaskDataSource(this);
+        deadline = new Date();
+        try {
+            dataSource.open();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         final Button addDate = (Button) findViewById(R.id.addDate);
         final Button addTime = (Button) findViewById(R.id.addTime);
 
@@ -69,9 +80,9 @@ public class AddTaskActivity extends ActionBarActivity {
     public void updateDate(int year, int month, int day) {
         final Button addDate = (Button) findViewById(R.id.addDate);
 
-        Date d = new Date(year-1900,month,day);
+        deadline = new Date(year-1900,month,day);
         SimpleDateFormat df = new SimpleDateFormat("EEEE, LLL d, y");
-        String formattedDate = df.format(d.getTime());
+        String formattedDate = df.format(deadline.getTime());
         addDate.setText(formattedDate);
     }
 
@@ -82,6 +93,8 @@ public class AddTaskActivity extends ActionBarActivity {
         } else {
             addTime.setText(hourOfDay + ":" + minute);
         }
+        deadline.setHours(hourOfDay);
+        deadline.setMinutes(minute);
     }
 
     @Override
@@ -95,16 +108,11 @@ public class AddTaskActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         int id  = menuItem.getItemId();
         if(id  == R.id.add_task) {
-            FileOutputStream outputStream;
             Button timeButton = (Button)findViewById(R.id.addTime);
             Button dateButton = (Button)findViewById(R.id.addDate);
             EditText taskName = (EditText) findViewById(R.id.taskName);
-            String taskLine = taskName.getText().toString() + ";" + dateButton.getText().toString() + ";"
-                    + timeButton.getText().toString();
             try {
-                outputStream = openFileOutput(MainActivity.fileName, Context.MODE_PRIVATE);
-                outputStream.write(taskLine.getBytes());
-                outputStream.close();
+                dataSource.createTask(new Task(taskName.getText().toString(), deadline, Task.State.COMPLETED));
             } catch (Exception e) {
                 e.printStackTrace();
             }

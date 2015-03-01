@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
+    private TaskDataSource dataSource;
 
     final ArrayList<Task> list = new ArrayList<Task>();
     public final static String fileName = "taskData";
@@ -42,9 +44,15 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final ListView listview = (ListView) findViewById(R.id.listview);
 
-        TaskDataSource.getInstance().load(getApplicationContext());
+        try {
+            dataSource = new TaskDataSource(this);
+            dataSource.open();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        final ListView listview = (ListView) findViewById(R.id.listview);
 
         Predicate<Task> isInProgress = new Predicate<Task>() {
             @Override
@@ -53,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
             }
         };
         adapter = new StableArrayAdapter(this,
-                R.layout.task_cell, TaskDataSource.getInstance().getInProgressTasks());
+                R.layout.task_cell, dataSource.getAllTasks());
 
 
 
@@ -115,29 +123,9 @@ public class MainActivity extends ActionBarActivity {
     public void onResume() {
         super.onResume();
         Log.d("Jacob", "RESUMING %%%%%%%%%%%%%%%%%%%%%%%%%%%");
-        readTasks();
+        adapter.clear();
+        adapter.addAll(dataSource.getAllTasks());
         adapter.notifyDataSetChanged();
-    }
-
-    private void readTasks() {
-        try {
-            InputStream inputStream = getApplicationContext().openFileInput(fileName);
-            Log.d("JACOB", "reading tasks **************");
-            if(inputStream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                String line = reader.readLine();
-                while(line != null) {
-                    Log.d("JACOB", line + "&&&&&&&&&&&&&&&&&&&&&&&&&&");
-                    String[] taskData = line.split(";");
-                    Date dueDate = new Date(taskData[1] + " " + taskData[2]);
-                    list.add(new Task(taskData[0], dueDate));
-                    line = reader.readLine();
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     private class StableArrayAdapter extends ArrayAdapter<Task> {
@@ -173,7 +161,7 @@ public class MainActivity extends ActionBarActivity {
             doneButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    TaskDataSource.getInstance().updateState(task, Task.State.COMPLETED, getApplicationContext());
+                    task.state = Task.State.COMPLETED;
                     viewHolder.animate().setDuration(1000).alpha(0)
                             .withEndAction(new Runnable() {
                                 @Override
@@ -187,7 +175,7 @@ public class MainActivity extends ActionBarActivity {
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    TaskDataSource.getInstance().updateState(task, Task.State.DELETED, getApplicationContext());
+                    task.state =  Task.State.DELETED;
                     viewHolder.animate().setDuration(1000).alpha(0)
                             .withEndAction(new Runnable() {
                                 @Override

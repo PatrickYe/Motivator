@@ -10,6 +10,7 @@ public class Task {
     public Date deadline;
     enum State {IN_PROGRESS, COMPLETED, FAILED, DELETED};
     public State state;
+    public long id;
 
 
     public Task(String title, Date deadline) {
