@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.facebook.Session;
 
 public class MainActivity extends FragmentActivity implements MainFragment.OnFragmentInteractionListener{
     private MainFragment mainFragment;
