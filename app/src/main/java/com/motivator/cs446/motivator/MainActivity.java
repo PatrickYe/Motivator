@@ -61,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
             }
         };
         adapter = new StableArrayAdapter(this,
-                R.layout.task_cell, dataSource.getAllTasks());
+                R.layout.task_cell, dataSource.getInProgressTasks());
 
 
 
@@ -124,7 +124,7 @@ public class MainActivity extends ActionBarActivity {
         super.onResume();
         Log.d("Jacob", "RESUMING %%%%%%%%%%%%%%%%%%%%%%%%%%%");
         adapter.clear();
-        adapter.addAll(dataSource.getAllTasks());
+        adapter.addAll(dataSource.getInProgressTasks());
         adapter.notifyDataSetChanged();
     }
 
@@ -162,10 +162,13 @@ public class MainActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v) {
                     task.state = Task.State.COMPLETED;
+                    dataSource.updateTask(task);
                     viewHolder.animate().setDuration(1000).alpha(0)
                             .withEndAction(new Runnable() {
                                 @Override
                                 public void run() {
+                                    adapter.clear();
+                                    adapter.addAll(dataSource.getInProgressTasks());
                                     adapter.notifyDataSetChanged();
                                     viewHolder.setAlpha(1);
                                 }
@@ -176,10 +179,13 @@ public class MainActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v) {
                     task.state =  Task.State.DELETED;
+                    dataSource.updateTask(task);
                     viewHolder.animate().setDuration(1000).alpha(0)
                             .withEndAction(new Runnable() {
                                 @Override
                                 public void run() {
+                                    adapter.clear();
+                                    adapter.addAll(dataSource.getInProgressTasks());
                                     adapter.notifyDataSetChanged();
                                     viewHolder.setAlpha(1);
                                 }

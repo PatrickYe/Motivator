@@ -55,20 +55,44 @@ public class TaskDataSource {
 
     public List<Task> getAllTasks() {
 
-        List<Task> comments = new ArrayList<Task>();
+        List<Task> tasks = new ArrayList<Task>();
 
         Cursor cursor = db.query(SQLiteHelper.TABLE_TASKS,
                 allColumns, null, null, null, null, null);
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Task comment = cursorToTask(cursor);
-            comments.add(comment);
+            Task task = cursorToTask(cursor);
+            tasks.add(task);
             cursor.moveToNext();
         }
         // make sure to close the cursor
         cursor.close();
-        return comments;
+        return tasks;
+    }
+
+    public List<Task> getInProgressTasks() {
+        List<Task> tasks = new ArrayList<Task>();
+
+        Cursor cursor = db.query(SQLiteHelper.TABLE_TASKS, allColumns, SQLiteHelper.COLUMN_STATE
+                + " = '" + Task.State.IN_PROGRESS.toString() + "'", null, null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Task task = cursorToTask(cursor);
+            tasks.add(task);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return tasks;
+    }
+
+    public Task updateTask(Task task) {
+        ContentValues values = new ContentValues();
+        values.put(SQLiteHelper.COLUMN_TITLE, task.title);
+        values.put(SQLiteHelper.COLUMN_DEADLINE, task.deadline.getTime());
+        values.put(SQLiteHelper.COLUMN_STATE, task.state.toString());
+        db.update(SQLiteHelper.TABLE_TASKS, values, SQLiteHelper.COLUMN_ID + " = " + task.id,null);
+        return task;
     }
 
     private Task cursorToTask(Cursor cursor) {
