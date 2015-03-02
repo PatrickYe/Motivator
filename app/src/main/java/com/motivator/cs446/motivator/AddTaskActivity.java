@@ -108,8 +108,6 @@ public class AddTaskActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         int id  = menuItem.getItemId();
         if(id  == R.id.add_task) {
-            Button timeButton = (Button)findViewById(R.id.addTime);
-            Button dateButton = (Button)findViewById(R.id.addDate);
             EditText taskName = (EditText) findViewById(R.id.taskName);
             try {
                 dataSource.createTask(new Task(taskName.getText().toString(), deadline, Task.State.COMPLETED));

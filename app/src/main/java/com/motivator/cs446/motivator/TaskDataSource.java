@@ -72,7 +72,7 @@ public class TaskDataSource {
     }
 
     private Task cursorToTask(Cursor cursor) {
-        Task task = new Task(cursor.getString(1), new Date(cursor.getInt(2)),
+        Task task = new Task(cursor.getString(1), new Date(cursor.getLong(2)),
                 Task.State.valueOf(cursor.getString(3)));
         task.id = cursor.getLong(0);
         return task;
