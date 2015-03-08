@@ -26,15 +26,15 @@ public class SplashFragment extends Fragment {
         loginButton = (LoginButton) view.findViewById(R.id.login_button);
         loginButton.setReadPermissions("user_friends");
 
-//        skipLoginButton = (TextView) view.findViewById(R.id.skip_login_button);
-//        skipLoginButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (skipLoginCallback != null) {
-//                    skipLoginCallback.onSkipLoginPressed();
-//                }
-//            }
-//        });
+        skipLoginButton = (TextView) view.findViewById(R.id.skip_login_button);
+        skipLoginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (skipLoginCallback != null) {
+                    skipLoginCallback.onSkipLoginPressed();
+                }
+            }
+        });
 
         return view;
     }

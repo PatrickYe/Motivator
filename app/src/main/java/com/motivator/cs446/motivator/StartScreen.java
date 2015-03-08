@@ -39,6 +39,10 @@ public class StartScreen extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState != null) {
+            userSkippedLogin = savedInstanceState.getBoolean(USER_SKIPPED_LOGIN_KEY);
+        }
+
         uiHelper = new UiLifecycleHelper(this, callback);
         uiHelper.onCreate(savedInstanceState);
 
@@ -52,6 +56,18 @@ public class StartScreen extends FragmentActivity {
         transaction.hide(splashFragment);
         transaction.commit();
 
+        splashFragment.setSkipLoginCallback(new SplashFragment.SkipLoginCallback() {
+            @Override
+            public void onSkipLoginPressed() {
+                userSkippedLogin = true;
+                startMainActivity();
+            }
+        });
+    }
+
+    public void startMainActivity(){
+        Intent intent = new Intent(this,MainActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -103,6 +119,9 @@ public class StartScreen extends FragmentActivity {
 
         if (session != null && session.isOpened()) {
             // if the session is already open, try to show the selection fragment
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        } else if (userSkippedLogin) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         } else {
