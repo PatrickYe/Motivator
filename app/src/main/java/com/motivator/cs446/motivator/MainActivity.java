@@ -1,8 +1,14 @@
 package com.motivator.cs446.motivator;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.gesture.Prediction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,10 +41,9 @@ import java.util.List;
 
 public class MainActivity extends ActionBarActivity {
     private TaskDataSource dataSource;
+    FragmentPagerAdapter adapterViewPager;
 
     final ArrayList<Task> list = new ArrayList<Task>();
-    public final static String fileName = "taskData";
-    StableArrayAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,40 +56,11 @@ public class MainActivity extends ActionBarActivity {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        final ListView listview = (ListView) findViewById(R.id.listview);
-
-        Predicate<Task> isInProgress = new Predicate<Task>() {
-            @Override
-            public boolean apply(Task task) {
-                return task.state == Task.State.IN_PROGRESS;
-            }
-        };
-        adapter = new StableArrayAdapter(this,
-                R.layout.task_cell, dataSource.getInProgressTasks());
+        ViewPager pager = (ViewPager) findViewById(R.id.vpPager);
+        adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
+        pager.setAdapter(adapterViewPager);
 
 
-
-        listview.setAdapter(adapter);
-
-//        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, final View view,
-//                                    int position, long id) {
-//                final Task item = (Task) parent.getItemAtPosition(position);
-//                view.animate().setDuration(1000).alpha(0)
-//                        .withEndAction(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                Task
-//                                adapter.notifyDataSetChanged();
-//                                view.setAlpha(1);
-//                            }
-//                        });
-//            }
-//
-//        });
     }
 
     @Override
@@ -123,89 +99,45 @@ public class MainActivity extends ActionBarActivity {
     public void onResume() {
         super.onResume();
         Log.d("Jacob", "RESUMING %%%%%%%%%%%%%%%%%%%%%%%%%%%");
-        adapter.clear();
-        adapter.addAll(dataSource.getInProgressTasks());
-        adapter.notifyDataSetChanged();
     }
 
-    private class StableArrayAdapter extends ArrayAdapter<Task> {
+    public static class MyPagerAdapter extends FragmentPagerAdapter {
+        private static int NUM_ITEMS = 3;
 
-//        HashMap<Task, Integer> mIdMap = new HashMap<Task, Integer>();
+        public MyPagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
 
-        public StableArrayAdapter(Context context, int textViewResourceId,
-                                  List<Task> objects) {
-            super(context, textViewResourceId, objects);
-            for (int i = 0; i < objects.size(); ++i) {
-//                mIdMap.put(objects.get(i), i);
+        // Returns total number of pages
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        // Returns the fragment to display for that page
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0: // Fragment # 0 - This will show FirstFragment
+                    return new PendingTaskFragment().setCompleted(false);
+                case 1: // Fragment # 0 - This will show FirstFragment different title
+                    return new PendingTaskFragment().setCompleted(true);
+                default:
+                    return null;
             }
         }
 
+        // Returns the page title for the top indicator
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            // Get the data item for this position
-            final Task task = getItem(position);
-            // Check if an existing view is being reused, otherwise inflate the view
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.task_cell, parent, false);
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "In Progress";
+                case 1:
+                    return "Completed";
             }
-            // Lookup view for data population
-            TextView taskName = (TextView) convertView.findViewById(R.id.firstLine);
-            TextView deadline = (TextView) convertView.findViewById(R.id.secondLine);
-            ImageButton doneButton = (ImageButton) convertView.findViewById(R.id.doneButton);
-            ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.deleteButton);
-            // Populate the data into the template view using the data object
-            taskName.setText(task.title);
-            deadline.setText(task.deadline.toString());
-            // Set click listeners for the buttons
-            final View viewHolder = convertView;
-            doneButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    task.state = Task.State.COMPLETED;
-                    dataSource.updateTask(task);
-                    viewHolder.animate().setDuration(1000).alpha(0)
-                            .withEndAction(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapter.clear();
-                                    adapter.addAll(dataSource.getInProgressTasks());
-                                    adapter.notifyDataSetChanged();
-                                    viewHolder.setAlpha(1);
-                                }
-                            });
-                }
-            });
-            deleteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    task.state =  Task.State.DELETED;
-                    dataSource.updateTask(task);
-                    viewHolder.animate().setDuration(1000).alpha(0)
-                            .withEndAction(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapter.clear();
-                                    adapter.addAll(dataSource.getInProgressTasks());
-                                    adapter.notifyDataSetChanged();
-                                    viewHolder.setAlpha(1);
-                                }
-                            });
-                }
-            });
-            // Return the completed view to render on screen
-            return convertView;
-        }
+            return "Unknown";
 
-        @Override
-        public long getItemId(int position) {
-            Task item = getItem(position);
-//            return mIdMap.get(item);
-            return position;
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return true;
         }
 
     }

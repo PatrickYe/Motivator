@@ -86,6 +86,21 @@ public class TaskDataSource {
         return tasks;
     }
 
+    public List<Task> getCompletedTasks() {
+        List<Task> tasks = new ArrayList<Task>();
+
+        Cursor cursor = db.query(SQLiteHelper.TABLE_TASKS, allColumns, SQLiteHelper.COLUMN_STATE
+                + " = '" + Task.State.COMPLETED.toString() + "'", null, null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Task task = cursorToTask(cursor);
+            tasks.add(task);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return tasks;
+    }
+
     public Task updateTask(Task task) {
         ContentValues values = new ContentValues();
         values.put(SQLiteHelper.COLUMN_TITLE, task.title);
