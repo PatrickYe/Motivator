@@ -4,9 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +20,7 @@ public class TaskDataSource {
     private SQLiteDatabase db;
     private SQLiteHelper dbHelper;
     private String[] allColumns = {SQLiteHelper.COLUMN_ID, SQLiteHelper.COLUMN_TITLE,
-            SQLiteHelper.COLUMN_DEADLINE, SQLiteHelper.COLUMN_STATE};
+            SQLiteHelper.COLUMN_DEADLINE, SQLiteHelper.COLUMN_STATE, SQLiteHelper.COLUMN_REPEAT};
 
     public TaskDataSource(Context context) {
         dbHelper = new SQLiteHelper(context);
@@ -37,6 +39,15 @@ public class TaskDataSource {
         values.put(SQLiteHelper.COLUMN_TITLE, task.title);
         values.put(SQLiteHelper.COLUMN_DEADLINE, task.deadline.getTime());
         values.put(SQLiteHelper.COLUMN_STATE, task.state.toString());
+
+        String repeat = "";
+        for(int i = 0; i < task.repeat.size() - 1; i++) {
+            repeat = repeat + task.repeat.get(i) + ",";
+        }
+        repeat = repeat + task.repeat.get(task.repeat.size() - 1);
+        values.put(SQLiteHelper.COLUMN_REPEAT, repeat);
+
+        Log.d("mehdi", "Inserting repeat:" + repeat);
         long insertId = db.insert(SQLiteHelper.TABLE_TASKS, null, values);
         Cursor cursor = db.query(SQLiteHelper.TABLE_TASKS,
                 allColumns, SQLiteHelper.COLUMN_ID + " = " + insertId, null,
@@ -107,13 +118,30 @@ public class TaskDataSource {
         values.put(SQLiteHelper.COLUMN_TITLE, task.title);
         values.put(SQLiteHelper.COLUMN_DEADLINE, task.deadline.getTime());
         values.put(SQLiteHelper.COLUMN_STATE, task.state.toString());
+        values.put(SQLiteHelper.COLUMN_REPEAT, task.repeat.toString());
         db.update(SQLiteHelper.TABLE_TASKS, values, SQLiteHelper.COLUMN_ID + " = " + task.id,null);
         return task;
     }
 
     private Task cursorToTask(Cursor cursor) {
+        String repeat = cursor.getString(4);
+        List<Integer> listOfInteger = null;
+        if (repeat != null) {
+            List<String> listOfString = Arrays.asList(cursor.getString(4).split("\\s*,\\s*"));
+
+            listOfInteger = new ArrayList<Integer>();
+            for(String s : listOfString) {
+                try {
+                    listOfInteger.add(Integer.valueOf(s));
+                } catch (Exception e) {
+                    listOfInteger.add(0);
+                }
+
+            }
+        }
+        Log.d("mehdi", "Retrieving repeat:" + listOfInteger.toString());
         Task task = new Task(cursor.getString(1), new Date(cursor.getLong(2)),
-                Task.State.valueOf(cursor.getString(3)));
+                Task.State.valueOf(cursor.getString(3)), listOfInteger);
         task.id = cursor.getLong(0);
         return task;
     }

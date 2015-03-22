@@ -9,13 +9,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import java.io.FileOutputStream;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by jacobsimon on 2/27/15.
@@ -23,6 +26,7 @@ import java.util.Date;
 public class AddTaskActivity extends ActionBarActivity {
     private TaskDataSource dataSource;
     private Date deadline;
+    private List<Integer> reccurence;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,12 @@ public class AddTaskActivity extends ActionBarActivity {
         setTitle("New Task");
         dataSource = new TaskDataSource(this);
         deadline = new Date();
+
+        reccurence = new ArrayList<Integer>();
+        for (int i =0; i< 7; i++) {
+            reccurence.add(i, 0);
+        }
+
         try {
             dataSource.open();
         } catch (SQLException e) {
@@ -39,6 +49,16 @@ public class AddTaskActivity extends ActionBarActivity {
         }
         final Button addDate = (Button) findViewById(R.id.addDate);
         final Button addTime = (Button) findViewById(R.id.addTime);
+
+        final CheckBox monday = (CheckBox) findViewById(R.id.monday);
+        final CheckBox tuesday = (CheckBox) findViewById(R.id.tuesday);
+        final CheckBox wednesday = (CheckBox) findViewById(R.id.wednesday);
+        final CheckBox thursday = (CheckBox) findViewById(R.id.thursday);
+        final CheckBox friday = (CheckBox) findViewById(R.id.friday);
+        final CheckBox saturday = (CheckBox) findViewById(R.id.saturday);
+        final CheckBox sunday = (CheckBox) findViewById(R.id.sunday);
+
+
 
         Calendar c = Calendar.getInstance();
 
@@ -62,6 +82,78 @@ public class AddTaskActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 showTimePickerDialog(v);
+            }
+        });
+
+        monday.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(monday.isChecked()) {
+                    reccurence.set(0, 1);
+                } else {
+                    reccurence.set(0, 0);
+                }
+
+            }
+        });
+        tuesday.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(monday.isChecked()) {
+                    reccurence.set(1, 1);
+                } else {
+                    reccurence.set(1, 0);
+                }
+            }
+        });
+        wednesday.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(monday.isChecked()) {
+                    reccurence.set(2, 1);
+                } else {
+                    reccurence.set(2, 0);
+                }
+            }
+        });
+        thursday.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(monday.isChecked()) {
+                    reccurence.set(3, 1);
+                } else {
+                    reccurence.set(3, 0);
+                }
+            }
+        });
+        friday.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(monday.isChecked()) {
+                    reccurence.set(4, 1);
+                } else {
+                    reccurence.set(4, 0);
+                }
+            }
+        });
+        saturday.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(monday.isChecked()) {
+                    reccurence.set(5, 1);
+                } else {
+                    reccurence.set(5, 0);
+                }
+            }
+        });
+        sunday.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(monday.isChecked()) {
+                    reccurence.set(6, 1);
+                } else {
+                    reccurence.set(6, 0);
+                }
             }
         });
     }
@@ -110,7 +202,7 @@ public class AddTaskActivity extends ActionBarActivity {
         if(id  == R.id.add_task) {
             EditText taskName = (EditText) findViewById(R.id.taskName);
             try {
-                dataSource.createTask(new Task(taskName.getText().toString(), deadline, Task.State.IN_PROGRESS));
+                dataSource.createTask(new Task(taskName.getText().toString(), deadline, Task.State.IN_PROGRESS, reccurence));
             } catch (Exception e) {
                 e.printStackTrace();
             }
