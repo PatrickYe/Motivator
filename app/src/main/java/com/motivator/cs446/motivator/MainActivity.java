@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -56,9 +57,27 @@ public class MainActivity extends ActionBarActivity {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        ViewPager pager = (ViewPager) findViewById(R.id.vpPager);
+        final ViewPager pager = (ViewPager) findViewById(R.id.vpPager);
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(adapterViewPager);
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                MyPagerAdapter adapter = (MyPagerAdapter) pager.getAdapter();
+                PendingTaskFragment fragment = (PendingTaskFragment)adapter.getRegisteredFragment(position);
+                fragment.tabChanged();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
 
     }
@@ -103,6 +122,8 @@ public class MainActivity extends ActionBarActivity {
 
     public static class MyPagerAdapter extends FragmentPagerAdapter {
         private static int NUM_ITEMS = 3;
+        SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
+
 
         public MyPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
@@ -119,9 +140,11 @@ public class MainActivity extends ActionBarActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0: // Fragment # 0 - This will show FirstFragment
-                    return new PendingTaskFragment().setCompleted(false);
+                    PendingTaskFragment fragment = new PendingTaskFragment().setCompleted(false);
+                    return fragment;
                 case 1: // Fragment # 0 - This will show FirstFragment different title
-                    return new PendingTaskFragment().setCompleted(true);
+                    PendingTaskFragment fragment1  = new PendingTaskFragment().setCompleted(true);
+                    return fragment1;
                 default:
                     return null;
             }
@@ -138,6 +161,23 @@ public class MainActivity extends ActionBarActivity {
             }
             return "Unknown";
 
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            registeredFragments.put(position, fragment);
+            return fragment;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            registeredFragments.remove(position);
+            super.destroyItem(container, position, object);
+        }
+
+        public Fragment getRegisteredFragment(int position) {
+            return registeredFragments.get(position);
         }
 
     }

@@ -14,16 +14,18 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_DEADLINE = "deadline";
     public static final String COLUMN_STATE = "state";
+    public static final String COLUMN_COMPLETEDON = "completedOn";
 
     private static final String DATABASE_NAME = "comments.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public static final String DATABASE_CREATE = "create table "
-            + TABLE_TASKS + "(" + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_TITLE
-            + " text not null, " + COLUMN_DEADLINE
-            + " bigint not null, " + COLUMN_STATE
-            + " text not null);";
+            + TABLE_TASKS + "("
+            + COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_TITLE + " text not null, "
+            + COLUMN_DEADLINE + " bigint not null, "
+            + COLUMN_COMPLETEDON + " bigint not null, "
+            + COLUMN_STATE + " text not null);";
 
     public SQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

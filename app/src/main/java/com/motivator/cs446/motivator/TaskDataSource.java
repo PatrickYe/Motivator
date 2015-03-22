@@ -18,7 +18,7 @@ public class TaskDataSource {
     private SQLiteDatabase db;
     private SQLiteHelper dbHelper;
     private String[] allColumns = {SQLiteHelper.COLUMN_ID, SQLiteHelper.COLUMN_TITLE,
-            SQLiteHelper.COLUMN_DEADLINE, SQLiteHelper.COLUMN_STATE};
+            SQLiteHelper.COLUMN_DEADLINE, SQLiteHelper.COLUMN_STATE, SQLiteHelper.COLUMN_COMPLETEDON};
 
     public TaskDataSource(Context context) {
         dbHelper = new SQLiteHelper(context);
@@ -37,6 +37,7 @@ public class TaskDataSource {
         values.put(SQLiteHelper.COLUMN_TITLE, task.title);
         values.put(SQLiteHelper.COLUMN_DEADLINE, task.deadline.getTime());
         values.put(SQLiteHelper.COLUMN_STATE, task.state.toString());
+        values.put(SQLiteHelper.COLUMN_COMPLETEDON, task.completedOn.getTime());
         long insertId = db.insert(SQLiteHelper.TABLE_TASKS, null, values);
         Cursor cursor = db.query(SQLiteHelper.TABLE_TASKS,
                 allColumns, SQLiteHelper.COLUMN_ID + " = " + insertId, null,
@@ -107,13 +108,14 @@ public class TaskDataSource {
         values.put(SQLiteHelper.COLUMN_TITLE, task.title);
         values.put(SQLiteHelper.COLUMN_DEADLINE, task.deadline.getTime());
         values.put(SQLiteHelper.COLUMN_STATE, task.state.toString());
+        values.put(SQLiteHelper.COLUMN_COMPLETEDON, task.deadline.getTime());
         db.update(SQLiteHelper.TABLE_TASKS, values, SQLiteHelper.COLUMN_ID + " = " + task.id,null);
         return task;
     }
 
     private Task cursorToTask(Cursor cursor) {
         Task task = new Task(cursor.getString(1), new Date(cursor.getLong(2)),
-                Task.State.valueOf(cursor.getString(3)));
+                Task.State.valueOf(cursor.getString(3)), new Date(cursor.getLong(4)));
         task.id = cursor.getLong(0);
         return task;
     }

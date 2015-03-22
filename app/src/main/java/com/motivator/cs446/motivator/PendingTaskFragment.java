@@ -21,6 +21,7 @@ import com.android.internal.util.Predicate;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,9 +31,9 @@ public class PendingTaskFragment extends Fragment {
     private TaskDataSource dataSource;
     private boolean isCompleted = false;
 
-    final ArrayList<Task> list = new ArrayList<Task>();
+    public ArrayList<Task> list = new ArrayList<Task>();
     public final static String fileName = "taskData";
-    StableArrayAdapter adapter;
+    public StableArrayAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,6 +105,15 @@ public class PendingTaskFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
+    public void tabChanged() {
+        if (adapter != null) {
+
+            adapter.clear();
+            adapter.addAll(isCompleted ? dataSource.getCompletedTasks() : dataSource.getInProgressTasks());
+            adapter.notifyDataSetChanged();
+        }
+    }
+
     private class StableArrayAdapter extends ArrayAdapter<Task> {
 
 //        HashMap<Task, Integer> mIdMap = new HashMap<Task, Integer>();
@@ -129,15 +139,21 @@ public class PendingTaskFragment extends Fragment {
             TextView deadline = (TextView) convertView.findViewById(R.id.secondLine);
             ImageButton doneButton = (ImageButton) convertView.findViewById(R.id.doneButton);
             ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.deleteButton);
+
+            if (isCompleted) {
+                doneButton.setVisibility(View.INVISIBLE);
+                deleteButton.setVisibility(View.INVISIBLE);
+            }
             // Populate the data into the template view using the data object
             taskName.setText(task.title);
-            deadline.setText(task.deadline.toString());
+            deadline.setText(isCompleted ? task.completedOn.toString() : task.deadline.toString());
             // Set click listeners for the buttons
             final View viewHolder = convertView;
             doneButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     task.state = Task.State.COMPLETED;
+                    task.completedOn = new Date();
                     dataSource.updateTask(task);
                     viewHolder.animate().setDuration(1000).alpha(0)
                             .withEndAction(new Runnable() {
