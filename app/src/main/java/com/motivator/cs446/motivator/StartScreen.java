@@ -132,6 +132,7 @@ public class StartScreen extends FragmentActivity {
         }
     }
 
+
     private void onSessionStateChange(Session session, SessionState state, Exception exception) {
         if (isResumed) {
             FragmentManager manager = getSupportFragmentManager();

@@ -21,5 +21,15 @@
         android:layout_gravity="center"
         android:textColor="#333"
         android:textSize="18sp" />
-
+    <Button
+        android:id="@+id/shareButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:onClick="onShareClick"
+        android:layout_marginTop="30dp"
+        android:visibility="visible"
+        android:text="@string/share"
+        />
 </RelativeLayout>
