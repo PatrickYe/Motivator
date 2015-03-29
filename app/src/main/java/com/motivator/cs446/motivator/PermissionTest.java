@@ -3,6 +3,7 @@ package com.motivator.cs446.motivator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
@@ -129,8 +130,10 @@ public class PermissionTest extends ActionBarActivity {
 
         //Part 2: upload the photo
 
-
-        Bitmap imageSelected = null;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        String photo_path = "";
+        Bitmap imageSelected = BitmapFactory.decodeFile(photo_path, options);
         Request request = Request.newUploadPhotoRequest(session, imageSelected, uploadPhotoRequestCallback);
 
         request.executeAsync();
