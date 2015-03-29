@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.gesture.Prediction;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import com.android.internal.util.Predicate;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,8 +71,10 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onPageSelected(int position) {
                 MyPagerAdapter adapter = (MyPagerAdapter) pager.getAdapter();
-                PendingTaskFragment fragment = (PendingTaskFragment)adapter.getRegisteredFragment(position);
-                fragment.tabChanged();
+                if (position < 2) {
+                    PendingTaskFragment fragment = (PendingTaskFragment) adapter.getRegisteredFragment(position);
+                    fragment.tabChanged();
+                }
             }
 
             @Override
@@ -111,6 +115,11 @@ public class MainActivity extends ActionBarActivity {
 //            adapter.notifyDataSetChanged();
         }
 
+        if (id == R.id.add_picture) {
+            Intent intent = new Intent(this, AddPictureActivity.class);
+            startActivity(intent);
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -132,7 +141,7 @@ public class MainActivity extends ActionBarActivity {
         // Returns total number of pages
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         // Returns the fragment to display for that page
@@ -145,6 +154,9 @@ public class MainActivity extends ActionBarActivity {
                 case 1: // Fragment # 0 - This will show FirstFragment different title
                     PendingTaskFragment fragment1  = new PendingTaskFragment().setCompleted(true);
                     return fragment1;
+                case 2:
+                    GalleryFragment fragment2 = new GalleryFragment();
+                    return fragment2;
                 default:
                     return null;
             }
@@ -158,6 +170,8 @@ public class MainActivity extends ActionBarActivity {
                     return "In Progress";
                 case 1:
                     return "Completed";
+                case 2:
+                    return "Gallery";
             }
             return "Unknown";
 
