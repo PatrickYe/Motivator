@@ -2,10 +2,12 @@ package com.motivator.cs446.motivator;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +47,7 @@ public class PermissionTest extends ActionBarActivity {
     private static final List<String> PERMISSIONS = Arrays.asList("publish_actions");
     private static final String PENDING_PUBLISH_KEY = "pendingPublishReauthorization";
     private boolean pendingPublishReauthorization = false;
+    String fbPhotoAddress;
 
     private Session.StatusCallback callback = new Session.StatusCallback() {
         @Override
@@ -54,7 +57,7 @@ public class PermissionTest extends ActionBarActivity {
     };
 
     public void onShareClick(View v) {
-        publishStory();
+        uploadImage();
     }
 
     @Override
@@ -83,27 +86,68 @@ public class PermissionTest extends ActionBarActivity {
         setContentView(R.layout.activity_permission_test);
     }
 
+    private void uploadImage(){
+        Session session = Session.getActiveSession();
+
+        // Check for publish permissions
+        List<String> permissions = session.getPermissions();
+        if (!isSubsetOf(PERMISSIONS, permissions)) {
+            pendingPublishReauthorization = true;
+            Session.NewPermissionsRequest newPermissionsRequest = new Session
+                    .NewPermissionsRequest(this, PERMISSIONS);
+            session.requestNewPublishPermissions(newPermissionsRequest);
+            return;
+        }
+
+        // Part 1: create callback to get URL of uploaded photo
+        Request.Callback uploadPhotoRequestCallback = new Request.Callback() {
+            @Override
+            public void onCompleted(Response response) {
+                // safety check
+                if (isFinishing()) {
+                    Log.i("1","");
+                    return;
+                }
+                if (response.getError() != null) {  // [IF Failed Posting]
+                    Log.d("D", "photo upload problem. Error="+response.getError() );
+                    Log.i("2","");
+                    return;
+                }  //  [ENDIF Failed Posting]
+
+                Object graphResponse = response.getGraphObject().getProperty("id");
+                if (graphResponse == null || !(graphResponse instanceof String) ||
+                        TextUtils.isEmpty((String) graphResponse)) { // [IF Failed upload/no results]
+                    Log.d("D", "failed photo upload/no response");
+                    Log.i("3","");
+                } else {  // [ELSEIF successful upload]
+                    fbPhotoAddress = "https://www.facebook.com/photo.php?fbid=" +graphResponse;
+                    Log.i("4","");
+                    publishStory();
+                }  // [ENDIF successful posting or not]
+            }  // [END onCompleted]
+        };
+
+        //Part 2: upload the photo
+
+
+        Bitmap imageSelected = null;
+        Request request = Request.newUploadPhotoRequest(session, imageSelected, uploadPhotoRequestCallback);
+
+        request.executeAsync();
+    }
+
+
     private void publishStory() {
         Session session = Session.getActiveSession();
 
         if (session != null){
 
-            // Check for publish permissions
-            List<String> permissions = session.getPermissions();
-            if (!isSubsetOf(PERMISSIONS, permissions)) {
-                pendingPublishReauthorization = true;
-                Session.NewPermissionsRequest newPermissionsRequest = new Session
-                        .NewPermissionsRequest(this, PERMISSIONS);
-                session.requestNewPublishPermissions(newPermissionsRequest);
-                return;
-            }
-
             Bundle postParams = new Bundle();
-            postParams.putString("name", "Facebook SDK for Android");
-            postParams.putString("caption", "Build great social apps and get more installs.");
-            postParams.putString("description", "The Facebook SDK for Android makes it easier and faster to develop Facebook integrated Android apps.");
-            postParams.putString("link", "https://developers.facebook.com/android");
-            postParams.putString("picture", "https://raw.github.com/fbsamples/ios-3.x-howtos/master/Images/iossdk_logo.png");
+            postParams.putString("name", "Motivator");
+//            postParams.putString("caption", "Testing1");
+            postParams.putString("description", "CS446");
+//            postParams.putString("link", "https://developers.facebook.com/android");
+            postParams.putString("picture", fbPhotoAddress);
 
             Request.Callback callback= new Request.Callback() {
                 public void onCompleted(Response response) {
@@ -211,7 +255,7 @@ public class PermissionTest extends ActionBarActivity {
         if (pendingPublishReauthorization &&
                 state.equals(SessionState.OPENED_TOKEN_UPDATED)) {
             pendingPublishReauthorization = false;
-            publishStory();
+            uploadImage();
         }
 
     }
