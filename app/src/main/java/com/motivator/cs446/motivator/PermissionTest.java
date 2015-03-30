@@ -282,7 +282,6 @@ public class PermissionTest extends ActionBarActivity {
         if (pendingPublishReauthorization &&
                 state.equals(SessionState.OPENED_TOKEN_UPDATED)) {
             pendingPublishReauthorization = false;
-            uploadImage();
         }
 
     }
