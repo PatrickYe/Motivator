@@ -43,8 +43,6 @@ import java.util.List;
 
 public class PermissionTest extends ActionBarActivity {
     private static final int REAUTH_ACTIVITY_CODE = 100;
-    private ProfilePictureView profilePictureView;
-    private TextView userNameView;
     private UiLifecycleHelper uiHelper;
     private Button shareButton;
     private static final List<String> PERMISSIONS = Arrays.asList("publish_actions");
@@ -67,14 +65,10 @@ public class PermissionTest extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("l","permission");
         RelativeLayout layout = (RelativeLayout) ((LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE)) .inflate(R.layout.activity_permission_test, null);
-        profilePictureView = (ProfilePictureView)layout.findViewById(R.id.selection_profile_pic);
-        if (profilePictureView == null){
-            Log.i("P","empty");
-        }
         shareButton = (Button) layout.findViewById(R.id.shareButton);
 //        profilePictureView.setCropped(true);
-        userNameView = (TextView) layout.findViewById(R.id.selection_user_name);
         uiHelper = new UiLifecycleHelper(this , callback);
         uiHelper.onCreate(savedInstanceState);
         // Check for an open session
@@ -87,7 +81,7 @@ public class PermissionTest extends ActionBarActivity {
             pendingPublishReauthorization =
                     savedInstanceState.getBoolean(PENDING_PUBLISH_KEY, false);
         }
-        setContentView(R.layout.activity_permission_test);
+//        setContentView(R.layout.activity_permission_test);
     }
 
     private void uploadImage(String des, String path){
@@ -253,11 +247,7 @@ public class PermissionTest extends ActionBarActivity {
                                 Log.i("u",user.getId());
                                 // Set the id for the ProfilePictureView
                                 // view that in turn displays the profile picture.
-                                if (profilePictureView != null) {
-                                    profilePictureView.setProfileId(user.getId());
-                                }
                                 // Set the Textview's text to the user's name.
-                                userNameView.setText(user.getName());
                             }
                         }
                         if (response.getError() != null) {

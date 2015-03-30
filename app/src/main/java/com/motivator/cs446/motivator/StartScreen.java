@@ -120,11 +120,11 @@ public class StartScreen extends FragmentActivity {
 
         if (session != null && session.isOpened()) {
             // if the session is already open, try to show the selection fragment
-            Intent intent = new Intent(this, PermissionTest.class);
+            Intent intent = new Intent(this, MainActivity.class);
             Log.i("Intent","permissiontest");
             startActivity(intent);
         } else if (userSkippedLogin) {
-            Intent intent = new Intent(this, PermissionTest.class);
+            Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         } else {
             // otherwise present the splash screen and ask the user to login, unless the user explicitly skipped.

@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
 
     <application
@@ -48,13 +49,20 @@
             android:name=".AddPictureActivity"
             android:label="@string/title_activity_add_picture"
             android:parentActivityName=".MainActivity" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.motivator.cs446.motivator.MainActivity" />
-          <activity
+
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.motivator.cs446.motivator.MainActivity" />
+
+        <activity
             android:name=".PermissionTest"
             android:label="@string/title_activity_permission_test" >
         </activity>
+        <service
+            android:name=".MyService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>
