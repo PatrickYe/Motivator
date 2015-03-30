@@ -20,7 +20,8 @@ public class TaskDataSource {
     private SQLiteDatabase db;
     private SQLiteHelper dbHelper;
     private String[] allColumns = {SQLiteHelper.COLUMN_ID, SQLiteHelper.COLUMN_TITLE,
-            SQLiteHelper.COLUMN_DEADLINE, SQLiteHelper.COLUMN_STATE, SQLiteHelper.COLUMN_REPEAT, SQLiteHelper.COLUMN_COMPLETEDON};
+            SQLiteHelper.COLUMN_DEADLINE, SQLiteHelper.COLUMN_STATE, SQLiteHelper.COLUMN_REPEAT,
+            SQLiteHelper.COLUMN_COMPLETEDON};
 
     public TaskDataSource(Context context) {
         dbHelper = new SQLiteHelper(context);

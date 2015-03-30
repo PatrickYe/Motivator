@@ -32,6 +32,14 @@ public class Task  implements Serializable {
         this.state = state;
         this.repeat = repeat;
         this.completedOn = completedOn;
+
+        if (this.repeat == null) {
+            List<Integer> rec = new ArrayList<Integer>();
+            for (int i = 0; i < 7; i++) {
+                rec.add(i, 0);
+            }
+            this.repeat = rec;
+        }
     }
 
     public Task(String title, Date deadline, State state, List<Integer> repeat) {
@@ -40,5 +48,21 @@ public class Task  implements Serializable {
 
     public Task(String title, Date deadline, State state) {
         this(title,deadline,state, null, new Date());
+    }
+
+    public boolean isRecurring() {
+        return repeat != null && repeat.contains(1);
+    }
+
+    public Date getNextDueDate() {
+        if (this.isRecurring()) {
+            int currDay = deadline.getDay();
+            for (int i = 1; i <= 7; i++) {
+                if (repeat.get((currDay + i + 6) % 7) == 1) {
+                    return new Date(deadline.getTime() + 1000*60*60*24*i);
+                }
+            }
+        }
+        return null;
     }
 }

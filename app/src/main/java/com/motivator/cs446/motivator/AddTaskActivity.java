@@ -202,7 +202,11 @@ public class AddTaskActivity extends ActionBarActivity {
         if(id  == R.id.add_task) {
             EditText taskName = (EditText) findViewById(R.id.taskName);
             try {
-                dataSource.createTask(new Task(taskName.getText().toString(), deadline, Task.State.IN_PROGRESS, reccurence));
+                Task task = new Task(taskName.getText().toString(), deadline, Task.State.IN_PROGRESS, reccurence);
+                if (task.isRecurring()) {
+                    task.deadline = task.getNextDueDate();
+                }
+                dataSource.createTask(task);
             } catch (Exception e) {
                 e.printStackTrace();
             }

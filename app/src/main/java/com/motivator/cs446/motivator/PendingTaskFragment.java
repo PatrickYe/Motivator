@@ -136,7 +136,7 @@ public class PendingTaskFragment extends Fragment {
             }
             // Lookup view for data population
             TextView taskName = (TextView) convertView.findViewById(R.id.firstLine);
-            TextView deadline = (TextView) convertView.findViewById(R.id.secondLine);
+            final TextView deadline = (TextView) convertView.findViewById(R.id.secondLine);
             ImageButton doneButton = (ImageButton) convertView.findViewById(R.id.doneButton);
             ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.deleteButton);
 
@@ -152,8 +152,14 @@ public class PendingTaskFragment extends Fragment {
             doneButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    task.state = Task.State.COMPLETED;
-                    task.completedOn = new Date();
+                    if (task.isRecurring()) {
+                        dataSource.createTask(new Task(task.title, task.deadline, Task.State.COMPLETED, null,
+                                new Date()));
+                        task.deadline = task.getNextDueDate();
+                    } else {
+                        task.state = Task.State.COMPLETED;
+                        task.completedOn = new Date();
+                    }
                     dataSource.updateTask(task);
                     viewHolder.animate().setDuration(1000).alpha(0)
                             .withEndAction(new Runnable() {
