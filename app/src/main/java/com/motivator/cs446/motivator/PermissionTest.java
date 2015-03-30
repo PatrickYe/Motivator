@@ -51,6 +51,7 @@ public class PermissionTest extends ActionBarActivity {
     private static final String PENDING_PUBLISH_KEY = "pendingPublishReauthorization";
     private boolean pendingPublishReauthorization = false;
     String fbPhotoAddress;
+    String description;
 
     private Session.StatusCallback callback = new Session.StatusCallback() {
         @Override
@@ -60,7 +61,7 @@ public class PermissionTest extends ActionBarActivity {
     };
 
     public void onShareClick(View v) {
-        uploadImage();
+        uploadImage("description","");
     }
 
     @Override
@@ -89,8 +90,9 @@ public class PermissionTest extends ActionBarActivity {
         setContentView(R.layout.activity_permission_test);
     }
 
-    private void uploadImage(){
+    private void uploadImage(String des, String path){
         Session session = Session.getActiveSession();
+        description = des;
 
         // Check for publish permissions
         List<String> permissions = session.getPermissions();
@@ -134,10 +136,9 @@ public class PermissionTest extends ActionBarActivity {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        String photo_path = "";
-        Bitmap imageSelected = BitmapFactory.decodeFile(photo_path, options);
+        Bitmap imageSelected = BitmapFactory.decodeFile(path, options);
         try {
-            ExifInterface exif = new ExifInterface(photo_path);
+            ExifInterface exif = new ExifInterface(path);
             int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
             Log.d("EXIF", "Exif: " + orientation);
             Matrix matrix = new Matrix();
@@ -169,7 +170,9 @@ public class PermissionTest extends ActionBarActivity {
             Bundle postParams = new Bundle();
             postParams.putString("name", "Motivator");
 //            postParams.putString("caption", "Testing1");
-            postParams.putString("description", "CS446");
+            if (description != null){
+                postParams.putString("description", description);
+            }
 //            postParams.putString("link", "https://developers.facebook.com/android");
             postParams.putString("picture", fbPhotoAddress);
 
