@@ -20,7 +20,8 @@ public class TaskDataSource {
     private SQLiteDatabase db;
     private SQLiteHelper dbHelper;
     private String[] allColumns = {SQLiteHelper.COLUMN_ID, SQLiteHelper.COLUMN_TITLE,
-            SQLiteHelper.COLUMN_DEADLINE, SQLiteHelper.COLUMN_STATE, SQLiteHelper.COLUMN_REPEAT, SQLiteHelper.COLUMN_COMPLETEDON};
+            SQLiteHelper.COLUMN_DEADLINE, SQLiteHelper.COLUMN_STATE, SQLiteHelper.COLUMN_REPEAT,
+            SQLiteHelper.COLUMN_COMPLETEDON};
 
     public TaskDataSource(Context context) {
         dbHelper = new SQLiteHelper(context);
@@ -72,7 +73,7 @@ public class TaskDataSource {
         List<Task> tasks = new ArrayList<Task>();
 
         Cursor cursor = db.query(SQLiteHelper.TABLE_TASKS,
-                allColumns, null, null, null, null, null);
+                allColumns, null, null, null, SQLiteHelper.COLUMN_DEADLINE, null);
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -89,7 +90,8 @@ public class TaskDataSource {
         List<Task> tasks = new ArrayList<Task>();
 
         Cursor cursor = db.query(SQLiteHelper.TABLE_TASKS, allColumns, SQLiteHelper.COLUMN_STATE
-                + " = '" + Task.State.IN_PROGRESS.toString() + "'", null, null, null, null);
+                + " = '" + Task.State.IN_PROGRESS.toString() + "'", null, null, null,
+                SQLiteHelper.COLUMN_DEADLINE);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Task task = cursorToTask(cursor);
@@ -104,7 +106,8 @@ public class TaskDataSource {
         List<Task> tasks = new ArrayList<Task>();
 
         Cursor cursor = db.query(SQLiteHelper.TABLE_TASKS, allColumns, SQLiteHelper.COLUMN_STATE
-                + " = '" + Task.State.COMPLETED.toString() + "'", null, null, null, null);
+                + " = '" + Task.State.COMPLETED.toString() + "'", null, null, null,
+                SQLiteHelper.COLUMN_COMPLETEDON);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Task task = cursorToTask(cursor);

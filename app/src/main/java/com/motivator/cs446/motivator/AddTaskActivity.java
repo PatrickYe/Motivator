@@ -99,7 +99,7 @@ public class AddTaskActivity extends ActionBarActivity {
         tuesday.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(monday.isChecked()) {
+                if(tuesday.isChecked()) {
                     reccurence.set(1, 1);
                 } else {
                     reccurence.set(1, 0);
@@ -109,7 +109,7 @@ public class AddTaskActivity extends ActionBarActivity {
         wednesday.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(monday.isChecked()) {
+                if(wednesday.isChecked()) {
                     reccurence.set(2, 1);
                 } else {
                     reccurence.set(2, 0);
@@ -119,7 +119,7 @@ public class AddTaskActivity extends ActionBarActivity {
         thursday.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(monday.isChecked()) {
+                if(thursday.isChecked()) {
                     reccurence.set(3, 1);
                 } else {
                     reccurence.set(3, 0);
@@ -129,7 +129,7 @@ public class AddTaskActivity extends ActionBarActivity {
         friday.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(monday.isChecked()) {
+                if(friday.isChecked()) {
                     reccurence.set(4, 1);
                 } else {
                     reccurence.set(4, 0);
@@ -139,7 +139,7 @@ public class AddTaskActivity extends ActionBarActivity {
         saturday.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(monday.isChecked()) {
+                if(saturday.isChecked()) {
                     reccurence.set(5, 1);
                 } else {
                     reccurence.set(5, 0);
@@ -149,7 +149,7 @@ public class AddTaskActivity extends ActionBarActivity {
         sunday.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(monday.isChecked()) {
+                if(sunday.isChecked()) {
                     reccurence.set(6, 1);
                 } else {
                     reccurence.set(6, 0);
@@ -202,7 +202,11 @@ public class AddTaskActivity extends ActionBarActivity {
         if(id  == R.id.add_task) {
             EditText taskName = (EditText) findViewById(R.id.taskName);
             try {
-                dataSource.createTask(new Task(taskName.getText().toString(), deadline, Task.State.IN_PROGRESS, reccurence));
+                Task task = new Task(taskName.getText().toString(), deadline, Task.State.IN_PROGRESS, reccurence);
+                if (task.isRecurring()) {
+                    task.deadline = task.getNextDueDate();
+                }
+                dataSource.createTask(task);
             } catch (Exception e) {
                 e.printStackTrace();
             }
