@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
@@ -134,6 +136,25 @@ public class PermissionTest extends ActionBarActivity {
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         String photo_path = "";
         Bitmap imageSelected = BitmapFactory.decodeFile(photo_path, options);
+        try {
+            ExifInterface exif = new ExifInterface(photo_path);
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+            Log.d("EXIF", "Exif: " + orientation);
+            Matrix matrix = new Matrix();
+            if (orientation == 6) {
+                matrix.postRotate(90);
+            }
+            else if (orientation == 3) {
+                matrix.postRotate(180);
+            }
+            else if (orientation == 8) {
+                matrix.postRotate(270);
+            }
+            imageSelected = Bitmap.createBitmap(imageSelected, 0, 0, imageSelected.getWidth(), imageSelected.getHeight(), matrix, true); // rotating bitmap
+        }
+        catch (Exception e) {
+
+        }
         Request request = Request.newUploadPhotoRequest(session, imageSelected, uploadPhotoRequestCallback);
 
         request.executeAsync();
