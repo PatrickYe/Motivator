@@ -52,8 +52,11 @@ public class GalleryFragment extends android.support.v4.app.Fragment{
 
         File[] files = targetDirector.listFiles();
 
-        for (File file : files){
-            myImageAdapter.add(file.getAbsolutePath());
+        if (files != null) {
+
+            for (File file : files) {
+                myImageAdapter.add(file.getAbsolutePath());
+            }
         }
         return view;
     }

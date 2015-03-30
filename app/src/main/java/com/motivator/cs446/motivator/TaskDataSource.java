@@ -73,7 +73,7 @@ public class TaskDataSource {
         List<Task> tasks = new ArrayList<Task>();
 
         Cursor cursor = db.query(SQLiteHelper.TABLE_TASKS,
-                allColumns, null, null, null, null, null);
+                allColumns, null, null, null, SQLiteHelper.COLUMN_DEADLINE, null);
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -90,7 +90,8 @@ public class TaskDataSource {
         List<Task> tasks = new ArrayList<Task>();
 
         Cursor cursor = db.query(SQLiteHelper.TABLE_TASKS, allColumns, SQLiteHelper.COLUMN_STATE
-                + " = '" + Task.State.IN_PROGRESS.toString() + "'", null, null, null, null);
+                + " = '" + Task.State.IN_PROGRESS.toString() + "'", null, null, null,
+                SQLiteHelper.COLUMN_DEADLINE);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Task task = cursorToTask(cursor);
@@ -105,7 +106,8 @@ public class TaskDataSource {
         List<Task> tasks = new ArrayList<Task>();
 
         Cursor cursor = db.query(SQLiteHelper.TABLE_TASKS, allColumns, SQLiteHelper.COLUMN_STATE
-                + " = '" + Task.State.COMPLETED.toString() + "'", null, null, null, null);
+                + " = '" + Task.State.COMPLETED.toString() + "'", null, null, null,
+                SQLiteHelper.COLUMN_COMPLETEDON);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Task task = cursorToTask(cursor);
