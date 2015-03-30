@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -132,7 +133,7 @@ public class PermissionTest extends ActionBarActivity {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        String photo_path = "";
+        String photo_path = Environment.getExternalStorageDirectory().getPath() + "Motivatr/IMG_20150329_140148";
         Bitmap imageSelected = BitmapFactory.decodeFile(photo_path, options);
         Request request = Request.newUploadPhotoRequest(session, imageSelected, uploadPhotoRequestCallback);
 
