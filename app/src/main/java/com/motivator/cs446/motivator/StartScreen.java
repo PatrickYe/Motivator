@@ -3,6 +3,7 @@ package com.motivator.cs446.motivator;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Intent;
@@ -119,16 +120,18 @@ public class StartScreen extends FragmentActivity {
 
         if (session != null && session.isOpened()) {
             // if the session is already open, try to show the selection fragment
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, PermissionTest.class);
+            Log.i("Intent","permissiontest");
             startActivity(intent);
         } else if (userSkippedLogin) {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, PermissionTest.class);
             startActivity(intent);
         } else {
             // otherwise present the splash screen and ask the user to login, unless the user explicitly skipped.
             showFragment(SPLASH, false);
         }
     }
+
 
     private void onSessionStateChange(Session session, SessionState state, Exception exception) {
         if (isResumed) {

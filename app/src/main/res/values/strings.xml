@@ -4,9 +4,14 @@
     <string name="app_name">Motivator</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_start_screen">StartScreen</string>
+    <string name="title_activity_start_screen">Motivator</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="app_id">865505920179290</string>
+<<<<<<< HEAD
     <string name="title_activity_add_picture">AddPictureActivity</string>
+=======
+    <string name="title_activity_permission_test">PermissionTest</string>
+    <string name="share">Share</string>
+>>>>>>> feature/FbPermission
 
 </resources>
