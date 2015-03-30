@@ -133,7 +133,7 @@ public class PermissionTest extends ActionBarActivity {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        String photo_path = Environment.getExternalStorageDirectory().getPath() + "Motivatr/IMG_20150329_140148";
+        String photo_path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Motivatr/IMG_20150329_140148.jpg";
         Bitmap imageSelected = BitmapFactory.decodeFile(photo_path, options);
         Request request = Request.newUploadPhotoRequest(session, imageSelected, uploadPhotoRequestCallback);
 
