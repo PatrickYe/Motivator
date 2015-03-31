@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,12 +25,16 @@ import com.facebook.UiLifecycleHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by patrick on 2015-03-30.
@@ -63,14 +68,19 @@ public class MyService extends Service{
         }
         if (dataSource != null) {
             List<Task> tasks = dataSource.getInProgressTasks();
-            if (tasks.size() > 1) {
+            if (tasks.size() > 0) {
+
+                Log.i("s", "task=" + tasks.size());
                 for (int i = 0; i < tasks.size(); i++) {
                     Calendar c = Calendar.getInstance();
                     Task curtask = tasks.get(i);
-                    if (curtask.deadline.after((Date) c.getTime())) {
+                    if (c.getTime().after(curtask.deadline)) {
                         curtask.state = Task.State.FAILED;
+                        Log.i("s", "failed");
+                        uploadImage("failed to achieve goal on time");
+                      //      publishStory();
                         dataSource.updateTask(curtask);
-                        publishStory();
+
                     }
                 }
             }
@@ -82,9 +92,32 @@ public class MyService extends Service{
         return START_NOT_STICKY;
     }
 
-    private void uploadImage(String des, String path){
+    private void uploadImage(String des){
         Session session = Session.getActiveSession();
         description = des;
+        String path = "";
+
+        String ExternalStorageDirectoryPath = Environment
+                .getExternalStorageDirectory()
+                .getAbsolutePath();
+
+        String targetPath = ExternalStorageDirectoryPath + "/Motivatr/";
+
+        File targetDirector = new File(targetPath);
+
+        File[] files = targetDirector.listFiles();
+        int gallerysize = files.length;
+        if (gallerysize < 1) {
+            Log.i("s", "no image in folder");
+            return;
+        }
+        Random rand = new Random();
+        int random =  rand.nextInt((gallerysize - 1) + 1) + 1;
+
+        if (files != null) {
+            path = files[random - 1].getAbsolutePath();
+            Log.i("s", "got file" + path);
+        }
 
         // Part 1: create callback to get URL of uploaded photo
         Request.Callback uploadPhotoRequestCallback = new Request.Callback() {
@@ -104,7 +137,7 @@ public class MyService extends Service{
                 } else {  // [ELSEIF successful upload]
                     fbPhotoAddress = "https://www.facebook.com/photo.php?fbid=" +graphResponse;
                     Log.i("4","");
-                    publishStory();
+//                    publishStory();
                 }  // [ENDIF successful posting or not]
             }  // [END onCompleted]
         };
@@ -135,7 +168,17 @@ public class MyService extends Service{
         }
         Request request = Request.newUploadPhotoRequest(session, imageSelected, uploadPhotoRequestCallback);
 
-        request.executeAsync();
+        request.executeAndWait();
+
+//        Timer timer = new Timer();
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                publishStory();
+//            }
+//        },5000);
+
+        publishStory();
     }
 
     private void publishStory() {
@@ -145,7 +188,7 @@ public class MyService extends Service{
 
             Bundle postParams = new Bundle();
             postParams.putString("name", "Motivator");
-//            postParams.putString("caption", "Testing1");
+            postParams.putString("caption", "Task Failed");
             if (description != null){
                 postParams.putString("description", description);
             }
