@@ -1,7 +1,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.motivator.cs446.motivator.SplashFragment">
+    tools:context="com.motivator.cs446.motivator.SplashFragment"
+    android:background="#003366"
+    android:foregroundTint="#fff9ed">
 
     <com.facebook.widget.LoginButton
         android:id="@+id/login_button"
@@ -12,15 +14,26 @@
         android:layout_marginBottom="30dp" />
 
     <TextView
-        android:id="@+id/skip_login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="skip"
-        android:textSize="12sp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:layout_marginBottom="30dp" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Motivatr"
+        android:id="@+id/textView"
+        android:layout_gravity="center_horizontal|bottom"
+        android:textSize="60dp"
+        android:layout_marginBottom="50dp"
+        android:textColor="#fff9ed" />
+
+    <!--<TextView-->
+        <!--android:id="@+id/skip_login_button"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!--android:text="skip"-->
+        <!--android:textSize="12sp"-->
+        <!--android:paddingLeft="20dp"-->
+        <!--android:paddingRight="20dp"-->
+        <!--android:layout_marginBottom="30dp" />-->
 
 
 </FrameLayout>

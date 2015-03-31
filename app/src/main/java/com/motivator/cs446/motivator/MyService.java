@@ -11,6 +11,7 @@ import android.media.ExifInterface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.StrictMode;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -20,7 +21,9 @@ import com.facebook.Request;
 import com.facebook.RequestAsyncTask;
 import com.facebook.Response;
 import com.facebook.Session;
+import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
+import com.facebook.model.GraphUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,12 +43,7 @@ import java.util.TimerTask;
  * Created by patrick on 2015-03-30.
  */
 public class MyService extends Service{
-    private static final int REAUTH_ACTIVITY_CODE = 100;
-    private UiLifecycleHelper uiHelper;
-    private static final List<String> PERMISSIONS = Arrays.asList("publish_actions");
-    private static final String PENDING_PUBLISH_KEY = "pendingPublishReauthorization";
-    private boolean pendingPublishReauthorization = false;
-    String fbPhotoAddress = "http://www.online-image-editor.com//styles/2014/images/example_image.png";
+    String fbPhotoAddress = "";
     String description;
     private TaskDataSource dataSource;
 
@@ -78,7 +76,6 @@ public class MyService extends Service{
                         curtask.state = Task.State.FAILED;
                         Log.i("s", "failed");
                         uploadImage("failed to achieve goal on time");
-                      //      publishStory();
                         dataSource.updateTask(curtask);
 
                     }
@@ -135,10 +132,10 @@ public class MyService extends Service{
                     Log.d("D", "failed photo upload/no response");
                     Log.i("3","");
                 } else {  // [ELSEIF successful upload]
-                    fbPhotoAddress = "https://www.facebook.com/photo.php?fbid=" +graphResponse;
-                    Log.i("4","");
-//                    publishStory();
-                }  // [ENDIF successful posting or not]
+//                    fbPhotoAddress = "https://graph.facebook.com/"+user_ID+"/"+graphResponse;
+                    Log.i("4",""+fbPhotoAddress);
+                }
+                // [ENDIF successful posting or not]
             }  // [END onCompleted]
         };
 
@@ -166,75 +163,73 @@ public class MyService extends Service{
         catch (Exception e) {
 
         }
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         Request request = Request.newUploadPhotoRequest(session, imageSelected, uploadPhotoRequestCallback);
 
         request.executeAndWait();
+    }
 
-//        Timer timer = new Timer();
-//        timer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                publishStory();
+//    private void publishStory() {
+//        Session session = Session.getActiveSession();
+//
+//        if (session != null){
+//
+//            Bundle postParams = new Bundle();
+//            postParams.putString("name", "Motivator");
+//            postParams.putString("caption", "Failed a task on Motivator");
+//            if (description != null){
+//                postParams.putString("description", description);
 //            }
-//        },5000);
-
-        publishStory();
-    }
-
-    private void publishStory() {
-        Session session = Session.getActiveSession();
-
-        if (session != null){
-
-            Bundle postParams = new Bundle();
-            postParams.putString("name", "Motivator");
-            postParams.putString("caption", "Task Failed");
-            if (description != null){
-                postParams.putString("description", description);
-            }
-//            postParams.putString("link", "https://developers.facebook.com/android");
-            postParams.putString("picture", fbPhotoAddress);
-
-            Request.Callback callback= new Request.Callback() {
-                public void onCompleted(Response response) {
-                    if (response.getGraphObject() != null) {
-                        JSONObject graphResponse = response
-                                .getGraphObject()
-                                .getInnerJSONObject();
-                        String postId = null;
-                        try {
-                            postId = graphResponse.getString("id");
-                        } catch (JSONException e) {
-                            Log.i("T",
-                                    "JSON error " + e.getMessage());
-                        }
-                        FacebookRequestError error = response.getError();
-//                    if (error != null) {
-//                        Toast.makeText(getActivity()
-//                                        .getApplicationContext(),
-//                                error.getErrorMessage(),
-//                                Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        Toast.makeText(getActivity()
-//                                        .getApplicationContext(),
-//                                postId,
-//                                Toast.LENGTH_LONG).show();
+////            postParams.putString("link", "https://developers.facebook.com/android");
+//            if (fbPhotoAddress == ""){
+//                Log.i("e","ew");
+//                return;
+//            }
+////            fbPhotoAddress = "https://fbcdn-sphotos-b-a.akamaihd.net/hphotos-ak-xap1/t31.0-8/10697163_10155416687950311_3531890027545747212_o.jpg";
+////            postParams.putString("picture", fbPhotoAddress);
+//
+//
+//            Request.Callback callback1= new Request.Callback() {
+//                public void onCompleted(Response response) {
+//                    if (response.getGraphObject() != null) {
+//                        JSONObject graphResponse = response
+//                                .getGraphObject()
+//                                .getInnerJSONObject();
+//                        String postId = null;
+//                        try {
+//                            postId = graphResponse.getString("id");
+//                        } catch (JSONException e) {
+//                            Log.i("T",
+//                                    "JSON error " + e.getMessage());
+//                        }
+//                        FacebookRequestError error = response.getError();
+////                    if (error != null) {
+////                        Toast.makeText(getActivity()
+////                                        .getApplicationContext(),
+////                                error.getErrorMessage(),
+////                                Toast.LENGTH_SHORT).show();
+////                    } else {
+////                        Toast.makeText(getActivity()
+////                                        .getApplicationContext(),
+////                                postId,
+////                                Toast.LENGTH_LONG).show();
+////                    }
 //                    }
-                    }
-                    else {
-                        Log.i("E","graphobject is null");
-                    }
-                }
-            };
-
-            Request request = new Request(session, "me/feed", postParams,
-                    HttpMethod.POST, callback);
-
-            RequestAsyncTask task = new RequestAsyncTask(request);
-            task.execute();
-        }
-
-    }
+//                    else {
+//                        Log.i("E","graphobject is null");
+//                    }
+//                }
+//            };
+//
+//            Request request = new Request(session, "me/feed", postParams,
+//                    HttpMethod.POST, callback1);
+//
+//            RequestAsyncTask task = new RequestAsyncTask(request);
+//            task.execute();
+//        }
+//
+//    }
     @Override
     public IBinder onBind(Intent intent) {
         return null;
