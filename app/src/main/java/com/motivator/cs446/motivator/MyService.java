@@ -24,6 +24,7 @@ import com.facebook.UiLifecycleHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -52,21 +53,27 @@ public class MyService extends Service{
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Query the database and show alarm if it applies
         Log.i("s", "time:"+System.currentTimeMillis());
-//        Intent n = new Intent(this, PermissionTest.class);
-//        n.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//
-        dataSource = new TaskDataSource(this);
+
+        try {
+            dataSource = new TaskDataSource(this);
+            dataSource.open();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
         if (dataSource != null) {
             List<Task> tasks = dataSource.getInProgressTasks();
-//            if (tasks.size() > 1) {
-//                for (int i = 0; i < tasks.size(); i++) {
-//                    Calendar c = Calendar.getInstance();
-//                    if (tasks.get(i).deadline.after((Date) c.getTime())) {
-//
-//                        publishStory();
-//                    }
-//                }
-//            }
+            if (tasks.size() > 1) {
+                for (int i = 0; i < tasks.size(); i++) {
+                    Calendar c = Calendar.getInstance();
+                    Task curtask = tasks.get(i);
+                    if (curtask.deadline.after((Date) c.getTime())) {
+                        curtask.state = Task.State.FAILED;
+                        dataSource.updateTask(curtask);
+                        publishStory();
+                    }
+                }
+            }
         }
         // Here you can return one of some different constants.
         // This one in particular means that if for some reason
